@@ -4,7 +4,7 @@ import React, { FormEvent, useState } from 'react';
 import * as api from '@/api';
 
 type SearchProps = {
-  processEnv: any;
+  apiKey: string;
 };
 
 type HslResponse = {
@@ -25,7 +25,7 @@ export const Search = (props: SearchProps) => {
 
   const handleSubmit = async (event: FormEvent<HTMLElement>) => {
     event.preventDefault();
-    setResponse(await api.getRoutes(props.processEnv.HSL_API_KEY));
+    setResponse(await api.getRoutes(props.apiKey));
   };
 
   return (
