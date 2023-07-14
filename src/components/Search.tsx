@@ -1,32 +1,34 @@
 'use client';
 
 import React, { FormEvent, useState } from 'react';
-import * as api from '@/api';
+import { HslRoutesDefault } from '@/types/HslRoutes';
+import { useQuery, gql } from '@apollo/client';
 
-type SearchProps = {
-  apiKey: string;
-};
+const GET_ROUTES = gql`
+  query Routes($term: String!) {
+    routes(name: $term) {
+      gtfsId
+      shortName
+      longName
+      mode
+    }
+  }
+`;
 
-type HslResponse = {
-  data: {
-    routes: [
-      {
-        gtfsId: string;
-        longName: string;
-        mode: string;
-        shortName: string;
-      }
-    ];
-  };
-};
-
-export const Search = (props: SearchProps) => {
-  const [response, setResponse] = useState<HslResponse>();
+export const Search = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const { loading, error, data } = useQuery(GET_ROUTES, {
+    variables: { term: '10' },
+  });
 
   const handleSubmit = async (event: FormEvent<HTMLElement>) => {
+    console.log(event);
     event.preventDefault();
-    setResponse(await api.getRoutes(props.apiKey));
   };
+
+  if (loading) return <p>Loading...</p>;
+
+  if (error) return <p>Error : {error.message}</p>;
 
   return (
     <div>
@@ -40,9 +42,8 @@ export const Search = (props: SearchProps) => {
         </fieldset>
         <button type='submit'>Hae</button>
         <ul>
-          {response ? (
-            response.data.routes.map((route) => {
-              console.log(route.longName);
+          {data ? (
+            data.routes.map((route: any) => {
               return <li key={route.shortName}>{route.longName}</li>;
             })
           ) : (
